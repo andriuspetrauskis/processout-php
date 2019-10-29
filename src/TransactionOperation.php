@@ -89,6 +89,18 @@ class TransactionOperation
     protected $type;
 
     /**
+     * Gateway Configuration that was used to process the payment, if any
+     * @var object
+     */
+    protected $gatewayConfiguration;
+
+    /**
+     * ID of the gateway configuration that was used to process the payment, if any
+     * @var string
+     */
+    protected $gatewayConfigurationId;
+    
+    /**
      * ID of the operation done through the PSP
      * @var string
      */
@@ -439,29 +451,60 @@ class TransactionOperation
         $this->type = $value;
         return $this;
     }
-    
+
+        
     /**
-     * Get GatewayOperationId
-     * ID of the operation done through the PSP
-     * @return string
+     * Get GatewayConfiguration
+     * Gateway Configuration that was used to process the payment, if any
+     * @return object
      */
-    public function getGatewayOperationId()
+    public function getGatewayConfiguration()
     {
-        return $this->gatewayOperationId;
+        return $this->gatewayConfiguration;
     }
 
     /**
-     * Set GatewayOperationId
-     * ID of the operation done through the PSP
-     * @param  string $value
+     * Set GatewayConfiguration
+     * Gateway Configuration that was used to process the payment, if any
+     * @param  object $value
      * @return $this
      */
-    public function setGatewayOperationId($value)
+    public function setGatewayConfiguration($value)
     {
-        $this->gatewayOperationId = $value;
+        if (is_object($value))
+            $this->gatewayConfiguration = $value;
+        else
+        {
+            $obj = new GatewayConfiguration($this->client);
+            $obj->fillWithData($value);
+            $this->gatewayConfiguration = $obj;
+        }
         return $this;
     }
     
+    /**
+     * Get GatewayConfigurationId
+     * ID of the gateway configuration that was used to process the payment, if any
+     * @return string
+     */
+    public function getGatewayConfigurationId()
+    {
+        return $this->gatewayConfigurationId;
+    }
+
+    /**
+     * Set GatewayConfigurationId
+     * ID of the gateway configuration that was used to process the payment, if any
+     * @param  string $value
+     * @return $this
+     */
+    public function setGatewayConfigurationId($value)
+    {
+        $this->gatewayConfigurationId = $value;
+        return $this;
+    }
+    
+
     /**
      * Get ErrorCode
      * Error code returned when attempting the operation, if any
@@ -705,6 +748,12 @@ class TransactionOperation
 
         if(! empty($data['gateway_operation_id']))
             $this->setGatewayOperationId($data['gateway_operation_id']);
+        
+        if(! empty($data['gateway_configuration']))
+            $this->setGatewayConfiguration($data['gateway_configuration']);
+
+        if(! empty($data['gateway_configuration_id']))
+            $this->setGatewayConfigurationId($data['gateway_configuration_id']);
 
         if(! empty($data['error_code']))
             $this->setErrorCode($data['error_code']);
